@@ -1,0 +1,27 @@
+// YAYO_CODE
+#include <Servo.h>
+#include <Servo.h>
+
+Servo thumb, fingers;
+
+int analogpin = 5;
+int val=0;
+  void setup()
+  {
+    fingers.attach(8);  //Attach the first of fingersservo in pin8
+    Serial.begin(9600);  // this is for  see the muscle actevity in graphe (traceur serri)
+  }
+  void loop()
+{
+  val = analogRead(analogpin); //out of EMG in A3
+  Serial.println(val);
+  if( val < 550) 
+  {
+    fingers.write(180);
+    delay(100);
+  }
+else{
+    fingers.write(0);
+    delay(100);
+  }
+}
