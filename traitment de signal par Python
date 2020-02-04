@@ -1,0 +1,37 @@
+//"" Transformée de Fourier discrète""
+def fft(liste):
+    N = len(liste)
+    if N==1:
+        return liste
+    pair = []
+    impair = []
+    for k in range(0,N,2):
+        pair.append(liste[k])
+    for k in range(1,N,2):
+        impair.append(liste[k])
+    tfd_pair = fft(pair)
+    tfd_impair = fft(impair)
+    tfd = [0]*N
+    W = numpy.exp(-1j*2*numpy.pi/N)
+    N2 = int(N/2)
+    for n in range(N2):
+        tfd[n] = tfd_pair[n]+tfd_impair[n]*W**n
+    for n in range(N2,N):
+        tfd[n] = tfd_pair[n-N2]+tfd_impair[n-N2]*W**n
+    return tfd
+    import numpy
+from matplotlib.pyplot import *
+
+p = 5
+N = 2**p
+u = numpy.zeros(N,dtype=complex)
+k = numpy.arange(N)
+u = numpy.sin(2*numpy.pi*k/N)+\
+    0.5*numpy.sin(4*numpy.pi*k/N)+0.25*numpy.cos(10*numpy.pi*k/N)
+tfd = fft(u)
+         
+from matplotlib.pyplot import *
+spectre = numpy.absolute(tfd)*2/N
+figure(figsize=(10,4))
+stem(k,spectre,'r')
+            
