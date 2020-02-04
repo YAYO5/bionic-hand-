@@ -1,0 +1,54 @@
+import pycanum.main as pycan
+from matplotlib.pyplot import *
+import numpy
+import math
+import numpy.fft
+import os
+
+os.chdir("C:/Users/fred/Documents/yayodoc/traitment-biosignal/EchantillonnageTFD")
+             
+nom = "sinus-1"
+             
+can = pycan.Sysam("SP5")
+             
+can.config_entrees([0],[2.0])
+             
+fe=1000.0
+T=2.0
+te=1.0/fe
+N = int(T/te)
+print(N)
+              
+can.config_echantillon(te*10**6,N)
+              
+can.acquerir()
+t0=can.temps()[0]
+u0=can.entrees()[0]
+can.fermer()
+              
+numpy.savetxt('%s.txt'%nom,[t0,u0])
+              
+te = t0[1]-t0[0]
+fe = 1.0/te
+N = t0.size
+T = t0[N-1]-t0[0]
+              
+figure()
+plot(t0,u0,'b')
+xlabel("t (s)")
+ylabel("u (V)")
+axis([0,0.5,-2,2])
+grid()
+savefig("%s-signal.pdf"%nom)
+              
+tfd=numpy.fft.fft(u0)
+a =numpy.absolute(tfd)/N
+f=numpy.arange(N)*1.0/T
+figure()
+plot(f,a)
+xlabel("f(hz)")
+ylabel("A")
+axis([0,fe,0,a.max()])
+grid()
+
+show()
