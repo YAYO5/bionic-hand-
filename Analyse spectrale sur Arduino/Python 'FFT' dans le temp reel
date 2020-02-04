@@ -1,0 +1,37 @@
+import scipy.signal
+import numpy
+from matplotlib.pyplot import *
+
+a = 0.05 # le rapport defréquence d coupure sur la fréquence d'échantillonnage fc/fe donne numero d'echantillonage 
+M=51
+b = scipy.signal.firwin(numtaps=M,cutoff=[a],window='hamming',nyq=0.5)
+Ne=256
+Q=int(Ne/2)
+
+w,h=scipy.signal.freqz(b,worN=Q*5)
+G=numpy.absolute(h)
+figure()
+subplot(211)
+plot(w/(2*numpy.pi),G)
+ylabel("G")
+grid()
+subplot(212)      
+plot(w/(2*numpy.pi),numpy.unwrap(numpy.angle(h)))
+xlabel("f/fe")
+ylabel("déphasage")
+grid()
+
+sa = "%0.3f"%a
+sa = sa.replace(".",",")
+f = open("RIF_%d_%s_%d.h"%(Ne,sa,M),"w")
+f.write("float rif[%d] = {"%M)
+for i in range(M-1):
+    f.write("%f,"%b[i])
+f.write("%f"%b[M-1])
+f.write("};\n")
+f.write("float gain_filtre[%d] = {"%Q)
+for i in range(Q-1):
+    f.write("%f,"%G[i])
+f.write("%f"%G[Q-1])
+f.write("};\n")
+f.close()
